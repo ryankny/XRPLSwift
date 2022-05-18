@@ -56,12 +56,13 @@ public class Ledger: NSObject {
             if status != "error" {
                 let _array = info["transactions"] as! [NSDictionary]
                 let filtered = _array.filter({ (dict) -> Bool in
-                    let validated = dict["validated"] as! Bool
+                    // validated is optional and isn't always included in the response JSOn
+                    let validated = dict["validated"] as? Bool
                     let tx = dict["tx"] as! NSDictionary
                     let meta = dict["meta"] as! NSDictionary
                     let res = meta["TransactionResult"] as! String
                     let type = tx["TransactionType"] as! String
-                    return validated && type == "Payment" && res == "tesSUCCESS"
+                    return (validated ?? true) && type == "Payment" && res == "tesSUCCESS"
                 })
                 
                 let transactions = filtered.map({ (dict) -> HistoricalTransaction in
